@@ -112,7 +112,7 @@ function DashboardContent() {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:3001/data')
+        axios.get('/api/data')
             .then(response =>  {
                 setChartData(response.data);
             })

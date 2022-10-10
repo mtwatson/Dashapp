@@ -3,75 +3,79 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 const port = 3001;
+const { v4: uuidv4 } = require('uuid');
 
-const db = mysql.createPool({
+const pool = mysql.createPool({
   host: 'mysql_db', // the host name MYSQL_DATABASE: node_mysql
   user: 'MYSQL_USER', // database user MYSQL_USER: MYSQL_USER
   // eslint-disable-next-line max-len
   password: 'MYSQL_PASSWORD', // database user password MYSQL_PASSWORD: MYSQL_PASSWORD
-  database: 'books', // database name MYSQL_HOST_IP: mysql_db
+  database: 'fics', // database name MYSQL_HOST_IP: mysql_db
 });
+
+const db = pool.promise();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-const data = [
-  ['00:00', 0],
-  ['03:00', 300],
-  ['06:00', 600],
-  ['09:00', 800],
-  ['12:00', 1500],
-  ['15:00', 2000],
-  ['18:00', 2400],
-  ['21:00', 2400],
-  ['24:00', undefined],
-];
-
 app.get('/data', (req, res) => {
-  res.send(data);
-});
-
-// get all of the books in the database
-app.get('/get', (req, res) => {
-  const SelectQuery = ' SELECT * FROM books_reviews';
-  db.query(SelectQuery, (err, result) => {
-    res.send(result);
-  });
+  const SelectQuery = ' SELECT * FROM fic_todos';
+  db.query(SelectQuery)
+      .catch((error) => console.error(error))
+      .then((result) => {
+        console.log(result);
+        res.send(result);
+      });
 });
 
 // add a book to the database
 app.post('/insert', (req, res) => {
-  const bookName = req.body.setBookName;
-  const bookReview = req.body.setReview;
   // eslint-disable-next-line max-len
-  const InsertQuery = `INSERT INTO books_reviews (book_name, book_review) VALUES (?, ?)`;
-  db.query(InsertQuery, [bookName, bookReview], (err, result) => {
-    console.log(result);
-  });
+  const InsertQuery = `INSERT INTO fic_todos (uuid, fic_name, fic_priority, fic_completion, fic_category, fic_status, fic_details, fic_color) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+  const {
+    ficName,
+    ficPriority,
+    ficCompletion,
+    ficCategory,
+    ficStatus,
+    ficDetails,
+    ficColor} = req.body;
+
+  const uuid = uuidv4();
+  console.log(req.body);
+  // eslint-disable-next-line max-len
+  db.query(InsertQuery, [uuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
+      .catch((error) => console.error(error))
+      .then((result) => {
+        res.send(result);
+      });
 });
 
 // delete a book from the database
 app.delete('/delete/:bookId', (req, res) => {
   const bookId = req.params.bookId;
-  const DeleteQuery = 'DELETE FROM books_reviews WHERE id = ?';
-  db.query(DeleteQuery, bookId, (err, result) => {
-    if (err) console.log(err);
-  });
+  const DeleteQuery = 'DELETE FROM fic_todos WHERE id = ?';
+  // eslint-disable-next-line max-len
+  db.query(DeleteQuery, bookId)
+      .catch((error) => console.error(error))
+      .then((result) => {
+        res.send(result);
+      });
 });
 
 // update a book review
 app.put('/update/:bookId', (req, res) => {
   const bookReview = req.body.reviewUpdate;
   const bookId = req.params.bookId;
-  const UpdateQuery = 'UPDATE books_reviews SET book_review = ? WHERE id = ?';
-  db.query(UpdateQuery, [bookReview, bookId], (err, result) => {
-    if (err) console.log(err);
-  });
-});
+  const UpdateQuery = 'UPDATE fic_todos SET book_review = ? WHERE id = ?';
 
-app.get('/', (req, res) => {
-  res.send('Hi There');
+  db.query(UpdateQuery, [bookReview, bookId])
+      .catch((error) => console.error(error))
+      .then((result) => {
+        res.send(result);
+      });
 });
 
 app.listen(port, () => {

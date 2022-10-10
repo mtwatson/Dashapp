@@ -1,0 +1,8 @@
+.fic-field {
+    display: inline-block;
+    min-width: 100px;
+}
+
+#fic-status {
+    width: 100px;
+}
