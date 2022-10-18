@@ -13,13 +13,22 @@ const ToDoDetails = (props) => {
     };
     const updateFic = (id, event) => {
         const {value} = event.target;
+        const updatedState = {...ficToDoContext};
+        updatedState.selectedFic[id] = value;
+
         setFicToDoContext((prevState) => {
-            return ({
-                ...prevState,
-                [id] : value
-            });
+            return (updatedState);
         });
     };
+
+    const {
+        ficName,
+        ficPriority,
+        ficCompletion,
+        ficCategory,
+        ficColor,
+        ficStatus
+    } = ficToDoContext.selectedFic;
 
     return (
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
@@ -29,8 +38,9 @@ const ToDoDetails = (props) => {
                     <TextField
                         id="fic-name"
                         labelId="fic-name-label"
-                        value={ficToDoContext.ficName}
+                        value={ficName || ''}
                         onChange={(e)=>{updateFic('ficName', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
                 <div className="fic-field">
@@ -39,8 +49,9 @@ const ToDoDetails = (props) => {
                         id="fic-priority"
                         labelId="fic-priority-label"
                         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                        value={ficToDoContext.ficPriority}
+                        value={ficPriority || ''}
                         onChange={(e)=>{updateFic('ficPriority', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
                 <div className="fic-field">
@@ -49,8 +60,9 @@ const ToDoDetails = (props) => {
                         id="fic-completion"
                         labelId="fic-completion-label"
                         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} 
-                        value={ficToDoContext.ficCompletion}
+                        value={ficCompletion || ''}
                         onChange={(e)=>{updateFic('ficCompletion', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
             </Grid>
@@ -60,8 +72,9 @@ const ToDoDetails = (props) => {
                     <TextField
                         id="fic-category"
                         labelId="fic-category-label"
-                        value={ficToDoContext.ficCategory}
+                        value={ficCategory || ''}
                         onChange={(e)=>{updateFic('ficCategory', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
                 <div className="fic-field">
@@ -69,9 +82,9 @@ const ToDoDetails = (props) => {
                     <TextField
                         id="fic-color"
                         labelId="fic-color-label"
-                        label="Error"
-                        value={ficToDoContext.ficColor}
+                        value={ficColor || ''}
                         onChange={(e)=>{updateFic('ficColor', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
                 <div className="fic-field">
@@ -81,8 +94,9 @@ const ToDoDetails = (props) => {
                         id="fic-status"
                         sx={dropdownStyles}
                         label="Age"
-                        value={ficToDoContext.ficStatus}
+                        value={ficStatus || ''}
                         onChange={(e)=>{updateFic('ficStatus', e)}}
+                        disabled={ficToDoContext.editorDisabled}
                     >
                         <MenuItem value={'Rewrite in progress'}>Rewrite in progress</MenuItem>
                         <MenuItem value={'Complete'}>Complete</MenuItem>

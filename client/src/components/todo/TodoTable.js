@@ -21,12 +21,16 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { Button } from '@mui/material';
+import './toDoTable.css';
 
 
-function createData(name, priority, completion, category, status) {
+function createData(id, name, priority, completion, category, status) {
     return {
+        id,
         name,
         priority,
         completion,
@@ -73,6 +77,12 @@ const headCells = [
         label: 'Name',
     },
     {
+        id: 'uuid',
+        numeric: false,
+        label: 'ID',
+        hidden: true,
+    },
+    {
         id: 'priority',
         numeric: true,
         disablePadding: false,
@@ -96,6 +106,12 @@ const headCells = [
         disablePadding: false,
         label: 'Status',
     },
+    {
+        id: 'edit',
+        numeric: false,
+        disablePadding: false,
+        label: 'Edit'
+    }
 ];
 
 function EnhancedTableHead(props) {
@@ -155,7 +171,16 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
+    const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
     const { numSelected } = props;
+    const newEntry = () => {
+        const updatedState = {...ficToDoContext};
+        updatedState.selectedFic = {};
+        updatedState.editorDisabled = false;
+        setFicToDoContext((prevState) => {
+            return (updatedState);
+        });
+    };
 
     return (
         <Toolbar
@@ -169,6 +194,7 @@ const EnhancedTableToolbar = (props) => {
             }}
         >
             {numSelected > 0 ? (
+                
                 <Typography
                     sx={{ flex: '1 1 100%' }}
                     color="inherit"
@@ -186,7 +212,7 @@ const EnhancedTableToolbar = (props) => {
                 >
           Fiction Tasks
                 </Typography>
-            )}
+            )            }
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
@@ -201,6 +227,7 @@ const EnhancedTableToolbar = (props) => {
                     </IconButton>
                 </Tooltip>
             )}
+            <Button variant="contained" sx={{fontSize:'12px', position:'absolute', right:'5em'}} onClick={newEntry}>New Entry</Button>
         </Toolbar>
     );
 };
@@ -217,8 +244,9 @@ export default function ToDoTable(props) {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const toDoData = [ficToDoContext]
-    const rows = toDoData.map(entry => createData(entry.ficName, entry.ficPriority, entry.ficCompletion, entry.ficCategory, entry.ficStatus));
+    const toDoData = ficToDoContext.fics;
+
+    const rows = toDoData.map(entry => createData(entry.uuid, entry.ficName, entry.ficPriority, entry.ficCompletion, entry.ficCategory, entry.ficStatus));
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -251,7 +279,6 @@ export default function ToDoTable(props) {
                 selected.slice(selectedIndex + 1),
             );
         }
-
         setSelected(newSelected);
     };
 
@@ -269,6 +296,19 @@ export default function ToDoTable(props) {
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
+
+    const setSelectedFic = (uuid) => {
+        const updatedState = {...ficToDoContext};
+        const newSelected = ficToDoContext.fics.filter(fic => {
+            return fic.uuid === uuid;
+        });
+        
+        updatedState.selectedFic = newSelected[0];
+        updatedState.editorDisabled = false;
+        setFicToDoContext((prevState) => {
+            return (updatedState);
+        });
+    };
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
@@ -300,6 +340,7 @@ export default function ToDoTable(props) {
                                 .map((row, index) => {
                                     const isItemSelected = isSelected(row.name);
                                     const labelId = `enhanced-table-checkbox-${index}`;
+                                    const id = row.id;
 
                                     return (
                                         <TableRow
@@ -328,10 +369,12 @@ export default function ToDoTable(props) {
                                             >
                                                 {row.name}
                                             </TableCell>
+                                            <TableCell align="right" >{row.id}</TableCell>
                                             <TableCell align="right">{row.priority}</TableCell>
                                             <TableCell align="right">{row.completion}</TableCell>
                                             <TableCell align="right">{row.category}</TableCell>
                                             <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell><EditIcon onClick={(e) => {setSelectedFic(id)}}></EditIcon></TableCell>
                                         </TableRow>
                                     );
                                 })}

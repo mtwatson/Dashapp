@@ -32,7 +32,7 @@ app.get('/data', (req, res) => {
 // add a book to the database
 app.post('/insert', (req, res) => {
   // eslint-disable-next-line max-len
-  const InsertQuery = `INSERT INTO fic_todos (uuid, fic_name, fic_priority, fic_completion, fic_category, fic_status, fic_details, fic_color) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+  const InsertQuery = `INSERT INTO fic_todos (uuid, fic_name, fic_priority, fic_completion, fic_category, fic_status, fic_details, fic_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const {
     ficName,
@@ -44,7 +44,6 @@ app.post('/insert', (req, res) => {
     ficColor} = req.body;
 
   const uuid = uuidv4();
-  console.log(req.body);
   // eslint-disable-next-line max-len
   db.query(InsertQuery, [uuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
       .catch((error) => console.error(error))

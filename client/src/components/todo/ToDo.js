@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Button } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
-import './toDo.css'
+import './toDo.css';
 
 const env = process.env.NODE_ENV;
 const apiDevServer = 'http://localhost:3001';
@@ -20,10 +20,40 @@ function ToDo() {
     }, []);
 
     const getData = () => {
-        // return axios.get(`${finalApiServer}/data`)
-        //     .then(response =>  {
-        //         setFicToDoContext(...response.data);
-        //     }).catch(error => console.error(error));
+        return axios.get(`${finalApiServer}/data`)
+            .then(response =>  {
+                const finalFicData = response.data[0].map(entry => {
+                    const {
+                        uuid, 
+                        id,
+                        fic_name, 
+                        fic_priority, 
+                        fic_completion, 
+                        fic_category, 
+                        fic_status, 
+                        fic_details, 
+                        fic_color
+                    } = entry;
+
+                    return {
+                        uuid,
+                        ficName: fic_name,
+                        ficPriority: fic_priority,
+                        ficCompletion: fic_completion,
+                        ficCategory: fic_category,
+                        ficStatus: fic_status,
+                        ficDetails: fic_details,
+                        ficColor: fic_color,
+                    };
+                });
+
+                setFicToDoContext((prevState) => {
+                    return ({
+                        ...prevState,
+                        fics: finalFicData
+                    });
+                });
+            }).catch(error => console.error(error));
     };
 
     const handleSaveContent = () => {
@@ -36,7 +66,7 @@ function ToDo() {
             ficStatus,
             ficDetails,
             ficColor,
-        } = ficToDoContext;
+        } = ficToDoContext.selectedFic;
         
         return axios.post(`${finalApiServer}/insert`, {
             uuid,
@@ -49,30 +79,30 @@ function ToDo() {
             ficColor
         })
             .then(response =>  {
-                // setFicToDoContext(...response.data);
+                getData();
             }).catch(error => console.error(error));
     };
 
 
     return (
-        <Grid container spacing={2}>
-            <Grid xs={12} md={12}>
+        <Grid container spacing={2}> 
+            <Grid xs={12} md={12} className='fic-editor-border'>
                 <div>
                     <ToDoTable></ToDoTable>
                 </div>
             </Grid>
-            <Grid xs={12} md={12}>
+            <Grid xs={12} md={12} className={`${ficToDoContext.editorDisabled ? 'disabled' : ''}`}>
                 <div>
                     <ToDoDetails></ToDoDetails>
                 </div>
             </Grid>
-            <Grid xs={12} md={12}>
+            <Grid xs={12} md={12} className={`${ficToDoContext.editorDisabled ? 'disabled' : ''}`}>
                 <div>
-                    <div className="populate-data">
-                        <Button variant="contained" onClick={getData}>Get Data</Button>
+                    <div className="actions populate-data">
+                        <Button variant="contained" onClick={getData} disabled={ficToDoContext.editorDisabled}>Get Data</Button>
                     </div>
-                    <div className="tiny-mce-save">
-                        <Button variant="contained" onClick={handleSaveContent}>Save</Button>
+                    <div className="actions fic-editor-save">
+                        <Button variant="contained" onClick={handleSaveContent} disabled={ficToDoContext.editorDisabled}>Save</Button>
                     </div>
                 </div>
             </Grid>

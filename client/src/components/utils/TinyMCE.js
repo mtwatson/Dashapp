@@ -15,17 +15,20 @@ export default function TinyMCE(props) {
             setContent(editorRef.current.getContent());
         }
     };
+    const enc = new TextDecoder('utf-8');
+    // console.log(enc.decode(ficToDoContext.selectedFic.ficDetails));
+    console.log(ficToDoContext.selectedFic.ficDetails)
     
     const handleClearContent = () => {
         editorRef.current.setContent('');
     };
-
+    
     const updateFic = (value, editor) => {
+        console.log(value);
+        const updatedState = {...ficToDoContext};
+        updatedState.selectedFic.ficDetails = value;
         setFicToDoContext((prevState) => {
-            return ({
-                ...prevState,
-                'ficDetails' : value
-            });
+            return (updatedState);
         });
     };
 
@@ -34,7 +37,8 @@ export default function TinyMCE(props) {
             <Editor
                 apiKey='your-api-key'
                 onInit={(evt, editor) => editorRef.current = editor}
-                value={ficToDoContext.ficDetails}
+                value={ficToDoContext.selectedFic.ficDetails || ''}
+                disabled={ficToDoContext.editorDisabled}
                 onEditorChange={(value, editor)=>{updateFic(value, editor)}} 
                 init={{
                     height: 500,

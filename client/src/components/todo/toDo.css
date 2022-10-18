@@ -3,6 +3,28 @@
     min-width: 100px;
 }
 
+.fic-editor-border {
+    border-bottom: 3px solid #b5b5b5;
+}
+
+.actions {
+    display: inline-block;
+    padding-right: 10px;
+}
+
+.fic-editor-save {
+    text-align: right;
+    padding-top: 10px;
+}
+
+.disabled {
+    opacity: 0.4;
+}
+
+.hidden {
+    display: none;
+}
+
 #fic-status {
     width: 100px;
 }
