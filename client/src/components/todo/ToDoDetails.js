@@ -27,9 +27,9 @@ const ToDoDetails = (props) => {
         ficCompletion,
         ficCategory,
         ficColor,
-        ficStatus
+        ficStatus,
+        uuid
     } = ficToDoContext.selectedFic;
-
     return (
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
             <Grid xs={6} md={6}>

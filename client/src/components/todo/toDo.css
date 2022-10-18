@@ -10,11 +10,8 @@
 .actions {
     display: inline-block;
     padding-right: 10px;
-}
-
-.fic-editor-save {
-    text-align: right;
     padding-top: 10px;
+    text-align: right
 }
 
 .disabled {

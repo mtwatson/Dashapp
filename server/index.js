@@ -24,12 +24,15 @@ app.get('/data', (req, res) => {
   db.query(SelectQuery)
       .catch((error) => console.error(error))
       .then((result) => {
-        console.log(result);
+        if (result[0][0]?.fic_details) {
+          const newDetails = result[0][0].fic_details.toString();
+          result[0][0].fic_details = newDetails;
+        }
         res.send(result);
       });
 });
 
-// add a book to the database
+// add a fic to the database
 app.post('/insert', (req, res) => {
   // eslint-disable-next-line max-len
   const InsertQuery = `INSERT INTO fic_todos (uuid, fic_name, fic_priority, fic_completion, fic_category, fic_status, fic_details, fic_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -41,11 +44,12 @@ app.post('/insert', (req, res) => {
     ficCategory,
     ficStatus,
     ficDetails,
-    ficColor} = req.body;
+    ficColor,
+    uuid} = req.body;
 
-  const uuid = uuidv4();
+  const newEntryUuid = uuidv4();
   // eslint-disable-next-line max-len
-  db.query(InsertQuery, [uuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
+  db.query(InsertQuery, [newEntryUuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
       .catch((error) => console.error(error))
       .then((result) => {
         res.send(result);

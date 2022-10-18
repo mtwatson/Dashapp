@@ -56,6 +56,10 @@ function ToDo() {
             }).catch(error => console.error(error));
     };
 
+    const handleDeleteContent = () => {
+
+    };
+
     const handleSaveContent = () => {
         const {
             uuid,
@@ -102,7 +106,10 @@ function ToDo() {
                         <Button variant="contained" onClick={getData} disabled={ficToDoContext.editorDisabled}>Get Data</Button>
                     </div>
                     <div className="actions fic-editor-save">
-                        <Button variant="contained" onClick={handleSaveContent} disabled={ficToDoContext.editorDisabled}>Save</Button>
+                        <Button variant="contained" sx="background-color: #1b5e20;" onClick={handleSaveContent} disabled={ficToDoContext.editorDisabled}>Save</Button>
+                    </div>
+                    <div className="actions fic-editor-delete">
+                        <Button variant="contained" sx="background-color: #c62828;" onClick={handleDeleteContent} disabled={ficToDoContext.editorDisabled}>Delete</Button>
                     </div>
                 </div>
             </Grid>

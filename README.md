@@ -14,3 +14,6 @@ docker system prune -f
 
 ## Build & Run
 docker-compose up --build
+
+# For Docker Desktop & Newer Docker Versions
+docker compose up --build
