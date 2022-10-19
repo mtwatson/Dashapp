@@ -47,21 +47,38 @@ app.post('/insert', (req, res) => {
     ficColor,
     uuid} = req.body;
 
-  const newEntryUuid = uuidv4();
-  // eslint-disable-next-line max-len
-  db.query(InsertQuery, [newEntryUuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
-      .catch((error) => console.error(error))
-      .then((result) => {
-        res.send(result);
-      });
+  if (uuid) {
+    const SelectQuery = ' SELECT * FROM fic_todos WHERE uuid = ?';
+    db.query(SelectQuery, uuid)
+    .catch((error) => console.error(error))
+    .then((result) => {
+      if(result[0][0]) {
+        return res.status(400).send({
+          message: 'Record already exists'
+       });
+      } else {
+        return res.status(400).send({
+          message: 'Cannot insert record'
+       });
+      }
+    });
+  } else {
+    const newEntryUuid = uuidv4();
+    // eslint-disable-next-line max-len
+    db.query(InsertQuery, [newEntryUuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
+        .catch((error) => console.error(error))
+        .then((result) => {
+          res.send(result);
+        });  
+  }
 });
 
 // delete a book from the database
-app.delete('/delete/:bookId', (req, res) => {
-  const bookId = req.params.bookId;
-  const DeleteQuery = 'DELETE FROM fic_todos WHERE id = ?';
+app.delete('/delete/:uuid', (req, res) => {
+  const uuid = req.params.uuid;
+  const DeleteQuery = 'DELETE FROM fic_todos WHERE uuid = ?';
   // eslint-disable-next-line max-len
-  db.query(DeleteQuery, bookId)
+  db.query(DeleteQuery, uuid)
       .catch((error) => console.error(error))
       .then((result) => {
         res.send(result);

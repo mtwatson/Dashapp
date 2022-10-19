@@ -50,6 +50,8 @@ function ToDo() {
                 setFicToDoContext((prevState) => {
                     return ({
                         ...prevState,
+                        editorDisabled: true,
+                        selectedFic: {},
                         fics: finalFicData
                     });
                 });
@@ -57,7 +59,14 @@ function ToDo() {
     };
 
     const handleDeleteContent = () => {
+        const {uuid} = ficToDoContext.selectedFic;
 
+        return axios.delete(`${finalApiServer}/delete/${uuid}`, {
+            uuid
+        })
+            .then(response =>  {
+                getData();
+            }).catch(error => console.error(error));
     };
 
     const handleSaveContent = () => {
