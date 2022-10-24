@@ -12,6 +12,9 @@ docker rmi -f $(docker images -aq)
 ## Kill All
 docker system prune -f
 
+## Salt the Earth/Delete Volume Data
+docker volume prune -f
+
 ## Build & Run
 docker-compose up --build
 

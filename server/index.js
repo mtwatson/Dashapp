@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 const port = 3001;
-const { v4: uuidv4 } = require('uuid');
+const {v4: uuidv4} = require('uuid');
 
 const pool = mysql.createPool({
   host: 'mysql_db', // the host name MYSQL_DATABASE: node_mysql
@@ -24,10 +24,12 @@ app.get('/data', (req, res) => {
   db.query(SelectQuery)
       .catch((error) => console.error(error))
       .then((result) => {
-        if (result[0][0]?.fic_details) {
-          const newDetails = result[0][0].fic_details.toString();
-          result[0][0].fic_details = newDetails;
-        }
+        result[0].forEach((entry) => {
+          if (entry.fic_details) {
+            const newDetails = entry.fic_details.toString();
+            entry.fic_details = newDetails;
+          }
+        });
         res.send(result);
       });
 });
@@ -50,18 +52,18 @@ app.post('/insert', (req, res) => {
   if (uuid) {
     const SelectQuery = ' SELECT * FROM fic_todos WHERE uuid = ?';
     db.query(SelectQuery, uuid)
-    .catch((error) => console.error(error))
-    .then((result) => {
-      if(result[0][0]) {
-        return res.status(400).send({
-          message: 'Record already exists'
-       });
-      } else {
-        return res.status(400).send({
-          message: 'Cannot insert record'
-       });
-      }
-    });
+        .catch((error) => console.error(error))
+        .then((result) => {
+          if (result[0][0]) {
+            return res.status(400).send({
+              message: 'Record already exists',
+            });
+          } else {
+            return res.status(400).send({
+              message: 'Cannot insert record',
+            });
+          }
+        });
   } else {
     const newEntryUuid = uuidv4();
     // eslint-disable-next-line max-len
@@ -69,7 +71,7 @@ app.post('/insert', (req, res) => {
         .catch((error) => console.error(error))
         .then((result) => {
           res.send(result);
-        });  
+        });
   }
 });
 
@@ -86,12 +88,33 @@ app.delete('/delete/:uuid', (req, res) => {
 });
 
 // update a book review
-app.put('/update/:bookId', (req, res) => {
-  const bookReview = req.body.reviewUpdate;
-  const bookId = req.params.bookId;
-  const UpdateQuery = 'UPDATE fic_todos SET book_review = ? WHERE id = ?';
+app.put('/update/', (req, res) => {
+  const {
+    ficName,
+    ficPriority,
+    ficCompletion,
+    ficCategory,
+    ficStatus,
+    ficDetails,
+    ficColor,
+    uuid} = req.body;
 
-  db.query(UpdateQuery, [bookReview, bookId])
+  const UpdateQuery = `
+      UPDATE
+      fic_todos
+    SET
+      fic_name = ?,
+      fic_priority = ?,
+      fic_completion = ?,
+      fic_category = ?,
+      fic_status = ?,
+      fic_details = ?,
+      fic_color = ?
+    WHERE
+      uuid = ?
+  `;
+  // eslint-disable-next-line max-len
+  db.query(UpdateQuery, [ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor, uuid])
       .catch((error) => console.error(error))
       .then((result) => {
         res.send(result);

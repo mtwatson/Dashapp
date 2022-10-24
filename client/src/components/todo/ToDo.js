@@ -19,13 +19,25 @@ function ToDo() {
         getData();
     }, []);
 
+    const setSelectedFic = (uuid) => {
+        const updatedState = {...ficToDoContext};
+        const newSelected = ficToDoContext.fics.filter(fic => {
+            return fic.uuid === uuid;
+        });
+        
+        updatedState.selectedFic = newSelected[0];
+        updatedState.editorDisabled = false;
+        setFicToDoContext((prevState) => {
+            return (updatedState);
+        });
+    };
+
     const getData = () => {
         return axios.get(`${finalApiServer}/data`)
             .then(response =>  {
                 const finalFicData = response.data[0].map(entry => {
                     const {
                         uuid, 
-                        id,
                         fic_name, 
                         fic_priority, 
                         fic_completion, 
@@ -80,8 +92,8 @@ function ToDo() {
             ficDetails,
             ficColor,
         } = ficToDoContext.selectedFic;
-        
-        return axios.post(`${finalApiServer}/insert`, {
+
+        const payload = {
             uuid,
             ficName,
             ficPriority,
@@ -90,12 +102,37 @@ function ToDo() {
             ficStatus,
             ficDetails,
             ficColor
-        })
-            .then(response =>  {
-                getData();
-            }).catch(error => console.error(error));
+        };
+        
+        if (uuid) {
+            return axios.put(`${finalApiServer}/update`, payload)                
+                .then(async (response) =>  {
+                    await getData();
+                    return await setSelectedFic(uuid);
+                }).catch(error => console.error(error));
+        } else {
+            return axios.post(`${finalApiServer}/insert`, payload)
+                .then(async (response) =>  {
+                    return await getData();
+                }).catch(error => console.error(error));
+        }
     };
 
+    const determineText = () => ficToDoContext.selectedFic.uuid ? 'Update' : 'Save';
+
+    const requiredFieldsEmpty = () => {
+        const {
+            ficName,
+            ficPriority,
+            ficCompletion,
+            ficCategory,
+            ficStatus,
+        } = ficToDoContext.selectedFic;
+
+        return [ficName, ficPriority, ficCategory, ficStatus, ficCompletion].some(val => !val);
+    };
+
+    console.log(requiredFieldsEmpty());
 
     return (
         <Grid container spacing={2}> 
@@ -115,7 +152,7 @@ function ToDo() {
                         <Button variant="contained" onClick={getData} disabled={ficToDoContext.editorDisabled}>Get Data</Button>
                     </div>
                     <div className="actions fic-editor-save">
-                        <Button variant="contained" sx="background-color: #1b5e20;" onClick={handleSaveContent} disabled={ficToDoContext.editorDisabled}>Save</Button>
+                        <Button variant="contained" sx="background-color: #1b5e20;" onClick={handleSaveContent} disabled={ficToDoContext.editorDisabled || requiredFieldsEmpty()}>{determineText()}</Button>
                     </div>
                     <div className="actions fic-editor-delete">
                         <Button variant="contained" sx="background-color: #c62828;" onClick={handleDeleteContent} disabled={ficToDoContext.editorDisabled}>Delete</Button>

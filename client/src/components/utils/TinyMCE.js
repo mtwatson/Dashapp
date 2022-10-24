@@ -1,7 +1,5 @@
 import React, { useRef, useState, useContext } from 'react';
-import axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
-import { Button } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
 import './tinyMce.css'
 
@@ -9,22 +7,18 @@ export default function TinyMCE(props) {
     const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
     const editorRef = useRef(null);
     const [content, setContent] = useState();
-
+    console.log(ficToDoContext.selectedFic)
     const handleGetContent = () => {
         if (editorRef.current) {
             setContent(editorRef.current.getContent());
         }
     };
-    const enc = new TextDecoder('utf-8');
-    // console.log(enc.decode(ficToDoContext.selectedFic.ficDetails));
-    console.log(ficToDoContext.selectedFic.ficDetails)
-    
+
     const handleClearContent = () => {
         editorRef.current.setContent('');
     };
     
     const updateFic = (value, editor) => {
-        console.log(value);
         const updatedState = {...ficToDoContext};
         updatedState.selectedFic.ficDetails = value;
         setFicToDoContext((prevState) => {

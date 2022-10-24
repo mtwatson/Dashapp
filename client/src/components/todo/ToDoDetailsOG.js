@@ -4,9 +4,7 @@ import TinyMCE from '../utils/TinyMCE';
 import { MenuItem, Box, TextField, Select, InputLabel } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
 import Grid from '@mui/material/Unstable_Grid2';
-import './toDo.css';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import ficSchema from '../../../../schemas/FicSchema';
+import './toDo.css'
 
 const ToDoDetails = (props) => {
     const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
@@ -114,68 +112,5 @@ const ToDoDetails = (props) => {
         </Grid>
     )
 }
-
-const SignInForm = () => {
-    const initialValues = {
-        email: '',
-        password: ''
-    };
-
-    return (
-        <Formik
-            initialValues={initialValues}
-            validationSchema={ficSchema}
-            onSubmit={(values) => {
-                console.log(values);
-            }}
-        >
-            {(formik) => {
-                const { errors, touched, isValid, dirty } = formik;
-                return (
-                    <div className="container">
-                        <h1>Sign in to continue</h1>
-                        <Form>
-                            <div className="form-row">
-                                <label htmlFor="email">Email</label>
-                                <Field
-                                    type="email"
-                                    name="email"
-                                    id="email"
-                                    className={errors.email && touched.email ? 
-                                        'input-error' : null}
-                                />
-                                <ErrorMessage name="email" component="span" className="error" />
-                            </div>
-  
-                            <div className="form-row">
-                                <label htmlFor="password">Password</label>
-                                <Field
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    className={errors.password && touched.password ? 
-                                        'input-error' : null}
-                                />
-                                <ErrorMessage
-                                    name="password"
-                                    component="span"
-                                    className="error"
-                                />
-                            </div>
-  
-                            <button
-                                type="submit"
-                                className={!(dirty && isValid) ? 'disabled-btn' : ''}
-                                disabled={!(dirty && isValid)}
-                            >
-                  Sign In
-                            </button>
-                        </Form>
-                    </div>
-                );
-            }}
-        </Formik>
-    );
-};
   
 export default ToDoDetails

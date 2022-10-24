@@ -1,6 +1,7 @@
 .fic-field {
     display: inline-block;
     min-width: 100px;
+    min-height: 120px;
 }
 
 .fic-editor-border {
@@ -24,4 +25,10 @@
 
 #fic-status {
     width: 100px;
+}
+
+.field-required {
+    padding-left: 10px;
+    font-size:0.8em;
+    color:#b5b5b5;
 }
