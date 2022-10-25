@@ -7,6 +7,7 @@ import { useEffect, useState, useContext } from 'react';
 import { Button } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
 import './toDo.css';
+import ficSchema from '../../schemas/FicSchema';
 
 const env = process.env.NODE_ENV;
 const apiDevServer = 'http://localhost:3001';
@@ -103,6 +104,8 @@ function ToDo() {
             ficDetails,
             ficColor
         };
+
+        console.log(ficSchema.validate(payload));
         
         if (uuid) {
             return axios.put(`${finalApiServer}/update`, payload)                

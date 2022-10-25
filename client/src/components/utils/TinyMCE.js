@@ -7,7 +7,7 @@ export default function TinyMCE(props) {
     const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
     const editorRef = useRef(null);
     const [content, setContent] = useState();
-    console.log(ficToDoContext.selectedFic)
+    
     const handleGetContent = () => {
         if (editorRef.current) {
             setContent(editorRef.current.getContent());
