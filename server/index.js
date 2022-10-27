@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const port = 3001;
 const {v4: uuidv4} = require('uuid');
+const FicSchema = require('./schemas/FicSchema');
 
 const pool = mysql.createPool({
   host: 'mysql_db', // the host name MYSQL_DATABASE: node_mysql
@@ -49,30 +50,40 @@ app.post('/insert', (req, res) => {
     ficColor,
     uuid} = req.body;
 
-  if (uuid) {
-    const SelectQuery = ' SELECT * FROM fic_todos WHERE uuid = ?';
-    db.query(SelectQuery, uuid)
-        .catch((error) => console.error(error))
-        .then((result) => {
-          if (result[0][0]) {
-            return res.status(400).send({
-              message: 'Record already exists',
+
+  FicSchema.validate(req.body)
+    .then(response => {
+      if (uuid) {
+        const SelectQuery = ' SELECT * FROM fic_todos WHERE uuid = ?';
+        db.query(SelectQuery, uuid)
+            .catch((error) => console.error(error))
+            .then((result) => {
+              if (result[0][0]) {
+                return res.status(400).send({
+                  message: 'Record already exists',
+                });
+              } else {
+                return res.status(400).send({
+                  message: 'Cannot insert record',
+                });
+              }
             });
-          } else {
-            return res.status(400).send({
-              message: 'Cannot insert record',
+      } else {
+        const newEntryUuid = uuidv4();
+        // eslint-disable-next-line max-len
+        db.query(InsertQuery, [newEntryUuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
+            .catch((error) => console.error(error))
+            .then((result) => {
+              res.send(result);
             });
-          }
-        });
-  } else {
-    const newEntryUuid = uuidv4();
-    // eslint-disable-next-line max-len
-    db.query(InsertQuery, [newEntryUuid, ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor])
-        .catch((error) => console.error(error))
-        .then((result) => {
-          res.send(result);
-        });
-  }
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(400).send({
+        message: err,
+      });
+    });
 });
 
 // delete a book from the database
@@ -99,26 +110,35 @@ app.put('/update/', (req, res) => {
     ficColor,
     uuid} = req.body;
 
-  const UpdateQuery = `
-      UPDATE
-      fic_todos
-    SET
-      fic_name = ?,
-      fic_priority = ?,
-      fic_completion = ?,
-      fic_category = ?,
-      fic_status = ?,
-      fic_details = ?,
-      fic_color = ?
-    WHERE
-      uuid = ?
-  `;
-  // eslint-disable-next-line max-len
-  db.query(UpdateQuery, [ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor, uuid])
-      .catch((error) => console.error(error))
-      .then((result) => {
-        res.send(result);
+    FicSchema.validate(req.body)
+    .then(response => {
+        const UpdateQuery = `
+        UPDATE
+        fic_todos
+      SET
+        fic_name = ?,
+        fic_priority = ?,
+        fic_completion = ?,
+        fic_category = ?,
+        fic_status = ?,
+        fic_details = ?,
+        fic_color = ?
+      WHERE
+        uuid = ?
+    `;
+      // eslint-disable-next-line max-len
+      db.query(UpdateQuery, [ficName, ficPriority, ficCompletion, ficCategory, ficStatus, ficDetails, ficColor, uuid])
+          .catch((error) => console.error(error))
+          .then((result) => {
+            res.send(result);
+          });
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(400).send({
+        message: err,
       });
+    });
 });
 
 app.listen(port, () => {

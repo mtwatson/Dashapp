@@ -2,12 +2,14 @@ import React from 'react';
 import ToDoTable from './TodoTable';
 import ToDoDetails from './ToDoDetails';
 import Grid from '@mui/material/Unstable_Grid2';
+import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Button } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
 import './toDo.css';
 import ficSchema from '../../schemas/FicSchema';
+import { YupVerboseError } from '../../schemas/YupVerboseError';
 
 const env = process.env.NODE_ENV;
 const apiDevServer = 'http://localhost:3001';
@@ -104,21 +106,26 @@ function ToDo() {
             ficDetails,
             ficColor
         };
-
-        console.log(ficSchema.validate(payload));
-        
-        if (uuid) {
-            return axios.put(`${finalApiServer}/update`, payload)                
-                .then(async (response) =>  {
-                    await getData();
-                    return await setSelectedFic(uuid);
-                }).catch(error => console.error(error));
-        } else {
-            return axios.post(`${finalApiServer}/insert`, payload)
-                .then(async (response) =>  {
-                    return await getData();
-                }).catch(error => console.error(error));
-        }
+        ficSchema.validate(payload, { abortEarly: false })
+            .then(response => {
+                console.log(response);
+                if (uuid) {
+                    return axios.put(`${finalApiServer}/update`, payload)                
+                        .then(async (response) =>  {
+                            await getData();
+                            return await setSelectedFic(uuid);
+                        }).catch(error => console.error(error));
+                } else {
+                    return axios.post(`${finalApiServer}/insert`, payload)
+                        .then(async (response) =>  {
+                            return await getData();
+                        }).catch(error => console.error(error));
+                }
+            })
+            .catch(err => {
+                console.log(err.inner)
+                console.log(YupVerboseError(err));
+            });
     };
 
     const determineText = () => ficToDoContext.selectedFic.uuid ? 'Update' : 'Save';
@@ -134,8 +141,6 @@ function ToDo() {
 
         return [ficName, ficPriority, ficCategory, ficStatus, ficCompletion].some(val => !val);
     };
-
-    console.log(requiredFieldsEmpty());
 
     return (
         <Grid container spacing={2}> 

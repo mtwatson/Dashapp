@@ -28,7 +28,7 @@ import { Button } from '@mui/material';
 import './toDoTable.css';
 
 
-function createData(id, name, priority, completion, category, status) {
+function createData(id, name, priority, completion, category, status, color) {
     return {
         id,
         name,
@@ -36,6 +36,7 @@ function createData(id, name, priority, completion, category, status) {
         completion,
         category,
         status,
+        color
     };
 };
 
@@ -80,7 +81,6 @@ const headCells = [
         id: 'uuid',
         numeric: false,
         label: 'ID',
-        hidden: true,
     },
     {
         id: 'priority',
@@ -96,7 +96,7 @@ const headCells = [
     },
     {
         id: 'category',
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: 'Category',
     },
@@ -105,6 +105,12 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Status',
+    },
+    {
+        id: 'color',
+        numeric: false,
+        disablePadding: false,
+        label: 'Color',
     },
     {
         id: 'edit',
@@ -245,8 +251,7 @@ export default function ToDoTable(props) {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const toDoData = ficToDoContext.fics;
-
-    const rows = toDoData.map(entry => createData(entry.uuid, entry.ficName, entry.ficPriority, entry.ficCompletion, entry.ficCategory, entry.ficStatus));
+    const rows = toDoData.map(entry => createData(entry.uuid, entry.ficName, entry.ficPriority, entry.ficCompletion, entry.ficCategory, entry.ficStatus, entry.ficColor));
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -266,7 +271,6 @@ export default function ToDoTable(props) {
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
-        console.log('click');
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, name);
         } else if (selectedIndex === 0) {
@@ -341,7 +345,7 @@ export default function ToDoTable(props) {
                                     const isItemSelected = isSelected(row.name);
                                     const labelId = `enhanced-table-checkbox-${index}`;
                                     const id = row.id;
-
+                                    const color = row.color || 'none';
                                     return (
                                         <TableRow
                                             hover
@@ -351,6 +355,7 @@ export default function ToDoTable(props) {
                                             tabIndex={-1}
                                             key={row.name}
                                             selected={isItemSelected}
+                                            sx={{backgroundColor: `${color}`}}
                                         >
                                             <TableCell padding="checkbox">
                                                 <Checkbox
@@ -366,14 +371,16 @@ export default function ToDoTable(props) {
                                                 id={labelId}
                                                 scope="row"
                                                 padding="none"
+                                                align="left"
                                             >
                                                 {row.name}
                                             </TableCell>
-                                            <TableCell align="right" >{row.id}</TableCell>
+                                            <TableCell align="left" >{row.id}</TableCell>
                                             <TableCell align="right">{row.priority}</TableCell>
                                             <TableCell align="right">{row.completion}</TableCell>
-                                            <TableCell align="right">{row.category}</TableCell>
+                                            <TableCell align="left">{row.category}</TableCell>
                                             <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">{row.color}</TableCell>
                                             <TableCell><EditIcon onClick={(e) => {setSelectedFic(id)}}></EditIcon></TableCell>
                                         </TableRow>
                                     );

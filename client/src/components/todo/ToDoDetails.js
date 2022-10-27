@@ -4,14 +4,26 @@ import TinyMCE from '../utils/TinyMCE';
 import { MenuItem, Box, TextField, Select, InputLabel } from '@mui/material';
 import FicToDoContext from '../../contexts/FicToDoContext';
 import Grid from '@mui/material/Unstable_Grid2';
+import { MuiColorInput, matchIsValidColor } from 'mui-color-input';
 import './toDo.css';
-import ficSchema from '../../schemas/FicSchema';
 
 const ToDoDetails = (props) => {
     const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
     const dropdownStyles = {
         marginLeft: '10px'
     };
+    const updateFicColor = (color, colors) => {
+        const {hex} = colors;
+        if (matchIsValidColor(colors.hex)) {
+            const updatedState = {...ficToDoContext};
+            updatedState.selectedFic.ficColor = hex;
+    
+            setFicToDoContext((prevState) => {
+                return (updatedState);
+            });
+        }
+    };
+
     const updateFic = (id, event) => {
         const {value} = event.target;
         const updatedState = {...ficToDoContext};
@@ -80,11 +92,12 @@ const ToDoDetails = (props) => {
                 </div>
                 <div className="fic-field">
                     <InputLabel id="fic-color-label">Color</InputLabel>
-                    <TextField
+                    <MuiColorInput
                         id="fic-color"
                         labelId="fic-color-label"
                         value={ficColor || ''}
-                        onChange={(e)=>{updateFic('ficColor', e)}}
+                        onChange={updateFicColor}
+                        format="hex"
                         disabled={ficToDoContext.editorDisabled}
                     />
                 </div>
