@@ -29,7 +29,6 @@ export default function TinyMCE(props) {
     return (
         <>
             <Editor
-                apiKey='your-api-key'
                 onInit={(evt, editor) => editorRef.current = editor}
                 value={ficToDoContext.selectedFic.ficDetails || ''}
                 disabled={ficToDoContext.editorDisabled}

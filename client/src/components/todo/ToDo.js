@@ -129,13 +129,14 @@ function ToDo() {
             })
             .catch(err => {
                 Object.values(YupVerboseError(err)).forEach(error => {
-                    Object.entries(errorDictionary).forEach((entry) => {
-                        const dictKeyString= entry[0];
-                        const validationErrorString = error[0];
-                        const dictErrorString = entry[1]
-                        const errorText = validationErrorString.includes(dictKeyString) ? dictErrorString : validationErrorString;
-                        handleClickVariant(errorText, 'error');
-                    });
+                    const dictMatch = Object.entries(errorDictionary)
+                        .filter((entry) => {
+                            const dictKeyString = entry[0];
+                            const validationErrorString = error[0];
+                            return  validationErrorString.includes(dictKeyString)
+                        });
+                    const finalErrorText = dictMatch[0] ? dictMatch[0][1] : error[0];
+                    handleClickVariant(finalErrorText, 'error');
                 });
             });
     };
