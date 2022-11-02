@@ -2,7 +2,6 @@ import React from 'react';
 import ToDoTable from './TodoTable';
 import ToDoDetails from './ToDoDetails';
 import Grid from '@mui/material/Unstable_Grid2';
-import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Button } from '@mui/material';
@@ -10,6 +9,8 @@ import FicToDoContext from '../../contexts/FicToDoContext';
 import './toDo.css';
 import ficSchema from '../../schemas/FicSchema';
 import { YupVerboseError } from '../../schemas/YupVerboseError';
+import { useSnackbar } from 'notistack';
+import errorDictionary from '../../data/errorDictionary';
 
 const env = process.env.NODE_ENV;
 const apiDevServer = 'http://localhost:3001';
@@ -18,6 +19,11 @@ const finalApiServer = env === 'production' ? apiProdServer : apiDevServer;
 
 function ToDo() {
     const [ficToDoContext, setFicToDoContext] = useContext(FicToDoContext);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const handleClickVariant = (text, variant) => {
+        // variant could be success, error, warning, info, or default
+        enqueueSnackbar(text, { variant });
+    };
     useEffect(() => {
         getData();
     }, []);
@@ -108,7 +114,6 @@ function ToDo() {
         };
         ficSchema.validate(payload, { abortEarly: false })
             .then(response => {
-                console.log(response);
                 if (uuid) {
                     return axios.put(`${finalApiServer}/update`, payload)                
                         .then(async (response) =>  {
@@ -123,8 +128,15 @@ function ToDo() {
                 }
             })
             .catch(err => {
-                console.log(err.inner)
-                console.log(YupVerboseError(err));
+                Object.values(YupVerboseError(err)).forEach(error => {
+                    Object.entries(errorDictionary).forEach((entry) => {
+                        const dictKeyString= entry[0];
+                        const validationErrorString = error[0];
+                        const dictErrorString = entry[1]
+                        const errorText = validationErrorString.includes(dictKeyString) ? dictErrorString : validationErrorString;
+                        handleClickVariant(errorText, 'error');
+                    });
+                });
             });
     };
 
